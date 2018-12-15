@@ -25,7 +25,10 @@ public class Main {
 
     static void saveFile(String data) {
 
-        String fileName = String.valueOf("results/" +System.currentTimeMillis()) + "_" + "wynik.txt";
+        String folderName = "results";
+        String fileName = String.valueOf(folderName + "/" +System.currentTimeMillis()) + "_" + "wynik.txt";
+
+        new File(folderName).mkdirs();
 
         try (PrintWriter out = new PrintWriter(fileName)) {
             out.println(data);
