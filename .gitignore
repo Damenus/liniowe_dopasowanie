@@ -1,4 +1,9 @@
-out/
+# Compiled class file
+*.class
+*.jar
+*.war
+*.ear
+
 
 # Eclipse
 .classpath
@@ -18,4 +23,4 @@ log/
 target/
 
 # ignore result
-results/
+results/*
