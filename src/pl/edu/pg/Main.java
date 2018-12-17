@@ -54,7 +54,54 @@ public class Main {
         System.out.println(metric.get("A", "T"));
         String sekwencjaA = readFile("sekwencjaA.txt");
         saveFile(sekwencjaA);
+        odlegloscEdycyjna(metric);
 
 
+    }
+
+    static int odlegloscEdycyjna(Metric metric) {
+
+        String sekwencjaA = "ACG"; // i u
+        String sekwencjaB = "ACA"; // j w
+
+        int liczbaLiterA = sekwencjaA.length();
+        int liczbaLiterB = sekwencjaB.length();
+
+        int[][] tablica = new int[liczbaLiterA][liczbaLiterB];
+
+        // 1. Brzeg tabeli
+        tablica[0][0] = 0;
+
+        for(int i = 1; i < liczbaLiterA; i++) {
+            for(int k = 0; k < i; k++) {
+                tablica[i][0] += metric.get(sekwencjaA.charAt(k), '-');
+            }
+        }
+
+        for(int j = 1; j < liczbaLiterB; j++) {
+            for(int k = 0; k < j; k++) {
+                tablica[0][j] += metric.get(sekwencjaA.charAt(k), '-');
+            }
+        }
+
+        // 2. Środek tabeli
+        for (int i = 1; i < liczbaLiterA; i++)
+            for (int j = 1; j < liczbaLiterB; j++)
+                tablica[i][j] = Math.min(
+                        tablica[i-1][j-1]+metric.get(sekwencjaA.charAt(i),sekwencjaB.charAt(j)),
+                        Math.min(
+                                tablica[i][j-1]+metric.get('-',sekwencjaB.charAt(j)),
+                                tablica[i-1][j]+metric.get(sekwencjaA.charAt(i),'-')
+                        )
+                );
+
+        for (int i = 0; i < liczbaLiterA; i++) {
+            for (int j = 0; j < liczbaLiterB; j++) {
+                System.out.print(tablica[i][j] + "   ");
+            }
+            System.out.println();
+        }
+
+        return tablica[liczbaLiterA-1][liczbaLiterB-1];
     }
 }

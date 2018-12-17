@@ -48,6 +48,13 @@ public class Metric {
         }
     }
 
+    public int get(char a, char b) {
+        if (a == b)
+            return 0;
+        else
+            return metrics.get((int) a + (int) b).intValue();
+    }
+
     public int get(String a, String b) {
         return metrics.get(a.codePointAt(0) + b.codePointAt(0)).intValue();
     }
