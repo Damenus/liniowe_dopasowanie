@@ -6,10 +6,20 @@ import java.io.PrintWriter;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.HashMap;
 
 import static java.lang.Class.forName;
 
 public class Main {
+
+    static Metric readMetrics() {
+
+        String metricsString = readFile("metryka.ini");
+        System.out.println(metricsString);
+        Metric metric = new Metric(metricsString);
+
+        return metric;
+    }
 
     static String readFile(String path) {
         byte[] encoded = new byte[0];
@@ -40,7 +50,11 @@ public class Main {
 
     public static void main(String[] args) {
 
+        Metric metric = readMetrics();
+        System.out.println(metric.get("A", "T"));
         String sekwencjaA = readFile("sekwencjaA.txt");
         saveFile(sekwencjaA);
+
+
     }
 }
