@@ -3,6 +3,7 @@ package pl.edu.pg;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.lang.reflect.Array;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -12,11 +13,13 @@ import static java.lang.Class.forName;
 
 public class Main {
 
+    static Metric metric;
+
     static Metric readMetrics() {
 
         String metricsString = readFile("metryka.ini");
         System.out.println(metricsString);
-        Metric metric = new Metric(metricsString);
+        metric = new Metric(metricsString);
 
         return metric;
     }
@@ -53,9 +56,19 @@ public class Main {
         Metric metric = readMetrics();
         System.out.println(metric.get("A", "T"));
         String sekwencjaA = readFile("sekwencjaA.txt");
+        String sekwencjaB = readFile("sekwencjaB.txt");
         saveFile(sekwencjaA);
         odlegloscEdycyjna(metric);
 
+
+        String A,B;
+        String[] result;
+        result = Hirschberg(sekwencjaA, sekwencjaB);
+        A = result[0];
+        B = result[1];
+        System.out.println(A);
+        System.out.println(B);
+        saveFile(A + ":" + B);
 
     }
 
@@ -104,4 +117,118 @@ public class Main {
 
         return tablica[liczbaLiterA-1][liczbaLiterB-1];
     }
+
+    static int[] NWScore(String X, String Y) {
+        int scoreSub, scoreDel, scoreIns;
+
+        //Metric metric = readMetrics();
+        int[][] Score = new int[Y.length()][Y.length()]; // 2*length(Y) array
+
+        for (int j = 1; j < Y.length(); j++) {
+            Score[0][j] = Score[0][j-1] + metric.insert(Y.charAt(j));
+        }
+
+        for (int i = 1; i < X.length(); i++) {
+            Score[1][0] = Score[0][0] + metric.delete(X.charAt(i));
+            for (int j = 1; j < Y.length(); j++) {
+                scoreSub = Score[0][j-1] + metric.get(X.charAt(i),Y.charAt(j));
+                scoreDel = Score[0][j] + metric.delete(X.charAt(i));
+                scoreIns = Score[1][j-1] + metric.insert(Y.charAt(j));
+                Score[1][j] = Math.max(scoreSub, Math.max(scoreDel, scoreIns));
+            }
+            //copy Score[1] to Score[0]
+            Score[0] = Score[1];
+        }
+        int[] LastLine = new int[Y.length()];
+        for (int j = 0; j < Y.length(); j++) {
+            LastLine[j] = Score[1][j];
+        }
+        return LastLine;
+
+    }
+
+    static String[] Hirschberg(String X, String Y) {
+
+        String Z = "";
+        String W = "";
+
+        int xlen,xmid,ylen,ymid;
+
+        int[] ScoreL,ScoreR;
+
+        if (X.length() == 0) {
+            for (int i = 1; i < Y.length(); i++) {
+                Z = Z + '-';
+                W = W + Y.charAt(i);
+            }
+        }
+        else if (Y.length() == 0) {
+            for (int i = 1; i < X.length(); i++) {
+                Z = Z + X.charAt(i);
+                W = W + '-';
+            }
+        }
+        else if (X.length() == 1 || Y.length() == 1) {
+            String[] A;
+            //A = NeedlemanWunsch(X,Y);
+            A = Hirschberg(X,Y);
+            Z = A[0];
+            W = A[1];
+        }
+        else {
+            xlen = X.length();
+            xmid = X.length()%2==0 ? X.length()/2-1 : X.length()/2;
+            ylen = Y.length();
+
+            ScoreL = NWScore(X.substring(1,xmid), Y);
+            ScoreR = NWScore(rev(X.substring(xmid+1,xlen)), rev(Y));
+            ymid = max(concatenate(ScoreL, rev(ScoreR)));
+
+            String[] A, B;
+            A = Hirschberg(X.substring(1,xmid), Y.substring(1,ymid));
+            B = Hirschberg(X.substring(xmid+1,xlen), Y.substring(ymid+1,ylen));
+            Z = A[0] + B[0];
+            W = A[1] + B[1];
+        }
+
+        String[] A = {Z, W};
+        return A;
+    }
+
+    static String rev(String a) {
+        return new StringBuffer(a).reverse().toString();
+    }
+
+    static int[] rev(int[] a) {
+        for(int i = 0; i < a.length / 2; i++)
+        {
+            int temp = a[i];
+            a[i] = a[a.length - i - 1];
+            a[a.length - i - 1] = temp;
+        }
+        return a;
+    }
+
+    static int[] concatenate(int[] a, int[] b) {
+        int aLen = a.length;
+        int bLen = b.length;
+
+        int[] c = (int[]) Array.newInstance(a.getClass().getComponentType(), aLen + bLen);
+        System.arraycopy(a, 0, c, 0, aLen);
+        System.arraycopy(b, 0, c, aLen, bLen);
+
+        return c;
+    }
+
+    static int max(int[] a) {
+        int max = -10000;
+
+        for (int i = 0; i < a.length; i++) {
+            if (a[i] > max)
+                max = a[i];
+        }
+
+        return max;
+    }
+
 }

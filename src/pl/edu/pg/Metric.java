@@ -30,6 +30,8 @@ import java.util.HashMap;
 public class Metric {
 
     HashMap<Integer, Integer> metrics;
+    HashMap<Character, Integer> insertCost;
+    HashMap<Character, Integer> deleteCost;
 
     public Metric(HashMap<Integer, Integer> metrics) {
         this.metrics = metrics;
@@ -37,6 +39,8 @@ public class Metric {
 
     public Metric(String metricsString) {
         this.metrics = new HashMap<>();
+        this.insertCost = new HashMap<>();
+        this.deleteCost = new HashMap<>();
 
         Integer sumLeters;
         Integer valueBetweenLeters;
@@ -46,6 +50,17 @@ public class Metric {
             valueBetweenLeters = Integer.valueOf(line.split("=")[1]);
             metrics.put(sumLeters,valueBetweenLeters);
         }
+
+        insertCost.put('A', 1);
+        insertCost.put('C', 1);
+        insertCost.put('G', 1);
+        insertCost.put('T', 1);
+
+        deleteCost.put('A', 1);
+        deleteCost.put('C', 1);
+        deleteCost.put('G', 1);
+        deleteCost.put('T', 1);
+
     }
 
     public int get(char a, char b) {
@@ -61,5 +76,13 @@ public class Metric {
 
     public int get(String a) {
         return metrics.get(a.codePointAt(0) + a.codePointAt(1)).intValue();
+    }
+
+    public int insert(char a) {
+        return insertCost.get(a).intValue();
+    }
+
+    public int delete(char a) {
+        return deleteCost.get(a).intValue();
     }
 }
