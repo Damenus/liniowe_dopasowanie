@@ -172,20 +172,21 @@ public class Main {
             String[] A;
             //A = NeedlemanWunsch(X,Y);
             A = Hirschberg(X,Y);
-            Z = A[0];
-            W = A[1];
+            Z = Z + A[0];
+            W = W + A[1];
         }
         else {
             xlen = X.length();
-            xmid = X.length()%2==0 ? X.length()/2-1 : X.length()/2;
+            xmid =  (int) X.length()/2; //X.length()%2==0 ? X.length()/2-1 : X.length()/2+1;
             ylen = Y.length();
 
-            ScoreL = NWScore(X.substring(1,xmid), Y);
+            ScoreL = NWScore(X.substring(0,xmid), Y);
             ScoreR = NWScore(rev(X.substring(xmid+1,xlen)), rev(Y));
-            ymid = max(concatenate(ScoreL, rev(ScoreR)));
+            //ymid = max(concatenate(ScoreL, rev(ScoreR)));
+            ymid = partition(ScoreL, rev(ScoreR));
 
             String[] A, B;
-            A = Hirschberg(X.substring(1,xmid), Y.substring(1,ymid));
+            A = Hirschberg(X.substring(0,xmid), Y.substring(0,ymid));
             B = Hirschberg(X.substring(xmid+1,xlen), Y.substring(ymid+1,ylen));
             Z = A[0] + B[0];
             W = A[1] + B[1];
@@ -230,5 +231,19 @@ public class Main {
 
         return max;
     }
+
+    private static int partition(int[] scoreL, int[] scoreR) {
+        int maxSum = Integer.MIN_VALUE;
+        int index = 0;
+        for(int iii = 0; iii < scoreL.length; iii++) {
+            int sum = scoreL[iii] + scoreR[scoreL.length - iii - 1];
+            if(sum >= maxSum) {
+                maxSum = sum;
+                index = iii;
+            }
+        }
+        return index;
+    }
+
 
 }
