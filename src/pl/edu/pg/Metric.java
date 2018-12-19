@@ -64,9 +64,6 @@ public class Metric {
     }
 
     public int get(char a, char b) {
-        if (a == b)
-            return 0;
-        else
             return metrics.get((int) a + (int) b).intValue();
     }
 
