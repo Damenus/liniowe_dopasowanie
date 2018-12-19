@@ -62,6 +62,7 @@ public class Main {
 
 
         NeedlemanWunsch(sekwencjaA,sekwencjaB);
+        /*
         String A,B;
         String[] result;
         result = Hirschberg(sekwencjaA, sekwencjaB);
@@ -69,7 +70,7 @@ public class Main {
         B = result[1];
         System.out.println(A);
         System.out.println(B);
-        saveFile(A + ":" + B);
+        saveFile(A + ":" + B);*/
 
     }
 
@@ -123,44 +124,78 @@ public class Main {
         int scoreSub, scoreDel, scoreIns;
 
         //Metric metric = readMetrics();
-        int[][] Score = new int[2][Y.length()]; // 2*length(Y) array
+        int[][] Score = new int[2][Y.length() + 1]; // 2*length(Y) array
 
-        for (int j = 1; j < Y.length(); j++) {
-            Score[0][j] = Score[0][j-1] + metric.insert(Y.charAt(j-1));
+        String[][] xOut = new String[2][Y.length() + 1];
+        String[][] yOut = new String[2][Y.length() + 1];
+
+
+        System.out.println(X + ", " + Y);
+
+        System.out.print(" ." + "0" + "./.");
+
+        xOut[0][0] = "";
+        yOut[0][0] = "";
+        for (int j = 0; j < Y.length(); j++) {
+            Score[0][j + 1] = Score[0][j] + metric.insert(Y.charAt(j));
+            xOut[0][j + 1] = "";
+            yOut[0][j + 1] = yOut[0][j] + "-";
+
+            System.out.print(" >" + Score[0][j + 1] + "-/" + yOut[0][j + 1]);
         }
+        System.out.println();
 
-        for (int i = 1; i < X.length(); i++) {
-            Score[1][0] = Score[0][0] + metric.delete(X.charAt(i-1));
-            for (int j = 1; j < Y.length(); j++) {
-                scoreSub = Score[0][j-1] + metric.get(X.charAt(i-1),Y.charAt(j-1));
-                scoreDel = Score[0][j] + metric.delete(X.charAt(i-1));
-                scoreIns = Score[1][j-1] + metric.insert(Y.charAt(j-1));
-                Score[1][j] = Math.max(scoreSub, Math.max(scoreDel, scoreIns));
-                //if (Score[1][j] == scoreSub){
-                    //NIC NIE MUSIMY WSTAWIAC
-                //}
-                if (Score[1][j] == scoreDel){
-                    Y = Y.substring(0,j) + "-" + Y.substring(j);
+        for (int i = 0; i < X.length(); i++) {
+            Score[1][0] = Score[0][0] + metric.delete(X.charAt(i));
+            xOut[1][0] = xOut[0][0] + "-";
+            yOut[1][0] = yOut[0][0];
+            System.out.print(" v" + Score[1][0] + xOut[1][0] + "/-");
+            for (int j = 0; j < Y.length(); j++) {
+                scoreSub = Score[0][j] + metric.get(X.charAt(i),Y.charAt(j));
+                //scoreSub = Score[0][j] + (X.charAt(i) == Y.charAt(j) ? 1 : -1);
+                scoreDel = Score[0][j + 1] + metric.delete(X.charAt(i));
+                scoreIns = Score[1][j] + metric.insert(Y.charAt(j));
+                Score[1][j + 1] = Math.max(scoreSub, Math.max(scoreDel, scoreIns));
+
+                if (Score[1][j + 1] == scoreSub){
+                    xOut[1][j + 1] = xOut[0][j] + X.charAt(i);
+                    yOut[1][j + 1] = yOut[0][j] + Y.charAt(j);
+
+                    System.out.print(" \\" + Score[1][j + 1]);
+                    System.out.print(" " + xOut[1][j + 1] + "/" + yOut[1][j + 1] + "|");
                 }
-                if (Score[1][j] == scoreIns){
-                    X = X.substring(0,i) + "-" + X.substring(i);
+                else {
+                    if (Score[1][j + 1] == scoreDel){
+                        xOut[1][j + 1] = xOut[0][j + 1] + X.charAt(i);
+                        yOut[1][j + 1] = yOut[0][j + 1] + "-";
+                        System.out.print(" v" + Score[1][j + 1]);
+                        System.out.print(" " + xOut[1][j + 1] + "/" + yOut[1][j + 1] + "|");
+                    }
+                    else {
+                        xOut[1][j + 1] = xOut[1][j] + "-";
+                        yOut[1][j + 1] = yOut[1][j] + Y.charAt(j);
+                        System.out.print(" >" + Score[1][j + 1]);
+                        System.out.print(" " + xOut[1][j + 1] + "/" + yOut[1][j + 1] + "|");
+                    }
                 }
             }
             //copy Score[1] to Score[0]
-            Score[0] = Score[1];
+            for (int j = 0; j < Y.length() + 1; j++) {
+                Score[0][j] = Score[1][j];
+                xOut[0][j] = xOut[1][j];
+                yOut[0][j] = yOut[1][j];
+            }
+            System.out.println();
         }
-        int[] LastLine = new int[Y.length()];
-        for (int j = 0; j < Y.length(); j++) {
-            LastLine[j] = Score[1][j];
-        }
-        String[] ret = {X,Y};
+
+        System.out.println();
+        System.out.println(xOut[0][Y.length()]);
+        System.out.println(yOut[0][Y.length()]);
+        System.out.println(Score[0][Y.length()]);
+
+        String[] ret = {xOut[0][Y.length()], yOut[0][Y.length()]};
         return ret;
-
     }
-
-    //A-T
-    //AGT
-
 
 
     static int[] NWScore(String X, String Y) {
@@ -191,6 +226,14 @@ public class Main {
         }
         return LastLine;
 
+    }
+
+    private static String repString(String str, int count){
+        String result = "";
+        for(int i = 0; i < count; i++){
+            result += str;
+        }
+        return result;
     }
 
     static String[] Hirschberg(String X, String Y) {

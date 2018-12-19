@@ -79,10 +79,16 @@ public class Metric {
     }
 
     public int insert(char a) {
+        if (insertCost.get(a) == null){
+            throw new UnsupportedOperationException("DeleteCost " + a + " does not exist");
+        }
         return insertCost.get(a).intValue();
     }
 
     public int delete(char a) {
+        if (deleteCost.get(a) == null){
+            throw new UnsupportedOperationException("DeleteCost " + a + " does not exist");
+        }
         return deleteCost.get(a).intValue();
     }
 }
