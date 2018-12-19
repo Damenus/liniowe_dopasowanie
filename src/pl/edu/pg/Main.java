@@ -62,14 +62,14 @@ public class Main {
 
 
         NeedlemanWunsch(sekwencjaA,sekwencjaB);
-//        String A,B;
-//        String[] result;
-//        result = Hirschberg(sekwencjaA, sekwencjaB);
-//        A = result[0];
-//        B = result[1];
-//        System.out.println(A);
-//        System.out.println(B);
-//        saveFile(A + ":" + B);
+        String A,B;
+        String[] result;
+        result = Hirschberg(sekwencjaA, sekwencjaB);
+        A = result[0];
+        B = result[1];
+        System.out.println(A);
+        System.out.println(B);
+        saveFile(A + ":" + B);
 
     }
 
@@ -136,14 +136,14 @@ public class Main {
                 scoreDel = Score[0][j] + metric.delete(X.charAt(i-1));
                 scoreIns = Score[1][j-1] + metric.insert(Y.charAt(j-1));
                 Score[1][j] = Math.max(scoreSub, Math.max(scoreDel, scoreIns));
-                if (Score[1][j] == scoreSub){
-
-                }
+                //if (Score[1][j] == scoreSub){
+                    //NIC NIE MUSIMY WSTAWIAC
+                //}
                 if (Score[1][j] == scoreDel){
-                    X = X.substring(0,i-1) + "-" + X.substring(i);
+                    Y = Y.substring(0,j) + "-" + Y.substring(j);
                 }
                 if (Score[1][j] == scoreIns){
-                    Y = Y.substring(0,j-1) + "-" + Y.substring(j);
+                    X = X.substring(0,i) + "-" + X.substring(i);
                 }
             }
             //copy Score[1] to Score[0]
@@ -153,28 +153,34 @@ public class Main {
         for (int j = 0; j < Y.length(); j++) {
             LastLine[j] = Score[1][j];
         }
-        String[] ret = {X};
+        String[] ret = {X,Y};
         return ret;
 
     }
+
+    //A-T
+    //AGT
+
+
 
     static int[] NWScore(String X, String Y) {
         int scoreSub, scoreDel, scoreIns;
 
         //Metric metric = readMetrics();
-        int[][] Score = new int[Y.length()][Y.length()]; // 2*length(Y) array
+        int[][] Score = new int[2][Y.length()]; // 2*length(Y) array
 
         for (int j = 1; j < Y.length(); j++) {
-            Score[0][j] = Score[0][j-1] + metric.insert(Y.charAt(j));
+            Score[0][j] = Score[0][j-1] + metric.insert(Y.charAt(j-1));
         }
 
         for (int i = 1; i < X.length(); i++) {
-            Score[1][0] = Score[0][0] + metric.delete(X.charAt(i));
+            Score[1][0] = Score[0][0] + metric.delete(X.charAt(i-1));
             for (int j = 1; j < Y.length(); j++) {
-                scoreSub = Score[0][j-1] + metric.get(X.charAt(i),Y.charAt(j));
-                scoreDel = Score[0][j] + metric.delete(X.charAt(i));
-                scoreIns = Score[1][j-1] + metric.insert(Y.charAt(j));
+                scoreSub = Score[0][j-1] + metric.get(X.charAt(i-1),Y.charAt(j-1));
+                scoreDel = Score[0][j] + metric.delete(X.charAt(i-1));
+                scoreIns = Score[1][j-1] + metric.insert(Y.charAt(j-1));
                 Score[1][j] = Math.max(scoreSub, Math.max(scoreDel, scoreIns));
+
             }
             //copy Score[1] to Score[0]
             Score[0] = Score[1];
