@@ -165,18 +165,66 @@ public class Main {
         String newA = "";
         String newB = "";
 
-        int i = liczbaLiterA;
-        int j = liczbaLiterB;
+        int i = liczbaLiterA-1;
+        int j = liczbaLiterB-1;
 
         int[] best = new int[3];
+        int bestOne;
 
         while(i > 0 && j > 0) {
             best[0] = S[i-1][j];
             best[1] = S[i-1][j-1];
             best[2] = S[i][j-1];
 
+            if (best[0] > best[1]) {
+                if (best[0] > best[2]) {
+                    bestOne = 0;
+                } else {
+                    bestOne = 2;
+                }
+            } else {
+                if (best[1] > best[2]) {
+                    bestOne = 1;
+                } else {
+                    bestOne = 2;
+                }
+            }
+
+            if (bestOne == 0) {
+                newA += sekwencjaA.charAt(i);
+                newB += '-';
+                i--;
+            }
+            else if (bestOne == 1) {
+                newA += sekwencjaA.charAt(i);
+                newB += sekwencjaB.charAt(j);
+                i--;
+                j--;
+
+            }
+            else if (bestOne == 2) {
+                newA += '-';
+                newB += sekwencjaB.charAt(j);
+                j--;
+            }
+
         }
 
+        if(i>0) {
+            for(int x = 0; x < i; x++) {
+                sekwencjaA += '-';
+            }
+
+        }
+
+        if(j>0) {
+            for(int x = 0; x < j; x++) {
+                sekwencjaB += '-';
+            }
+        }
+
+        System.out.println(rev(newA));
+        System.out.println(rev(newB));
 
         return S[liczbaLiterA-1][liczbaLiterB-1];
     }
