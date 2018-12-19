@@ -51,22 +51,22 @@ public class Metric {
             metrics.put(sumLeters,valueBetweenLeters);
         }
 
-        insertCost.put('A', -2);
-        insertCost.put('C', -2);
-        insertCost.put('G', -2);
-        insertCost.put('T', -2);
+        insertCost.put('A', -1);
+        insertCost.put('C', -1);
+        insertCost.put('G', -1);
+        insertCost.put('T', -1);
 
-        deleteCost.put('A', -2);
-        deleteCost.put('C', -2);
-        deleteCost.put('G', -2);
-        deleteCost.put('T', -2);
+        deleteCost.put('A', -1);
+        deleteCost.put('C', -1);
+        deleteCost.put('G', -1);
+        deleteCost.put('T', -1);
 
     }
 
     public int get(char a, char b) {
-        if (a == b)
-            return 0;
-        else
+//        if (a == b)
+//            return 0;
+//        else
             return metrics.get((int) a + (int) b).intValue();
     }
 

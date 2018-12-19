@@ -61,14 +61,15 @@ public class Main {
         odlegloscEdycyjna(metric);
 
 
-        String A,B;
-        String[] result;
-        result = Hirschberg(sekwencjaA, sekwencjaB);
-        A = result[0];
-        B = result[1];
-        System.out.println(A);
-        System.out.println(B);
-        saveFile(A + ":" + B);
+        NeedlemanWunsch(sekwencjaA,sekwencjaB);
+//        String A,B;
+//        String[] result;
+//        result = Hirschberg(sekwencjaA, sekwencjaB);
+//        A = result[0];
+//        B = result[1];
+//        System.out.println(A);
+//        System.out.println(B);
+//        saveFile(A + ":" + B);
 
     }
 
@@ -116,6 +117,45 @@ public class Main {
         }
 
         return tablica[liczbaLiterA-1][liczbaLiterB-1];
+    }
+
+    static String[] NeedlemanWunsch(String X, String Y) {
+        int scoreSub, scoreDel, scoreIns;
+
+        //Metric metric = readMetrics();
+        int[][] Score = new int[2][Y.length()]; // 2*length(Y) array
+
+        for (int j = 1; j < Y.length(); j++) {
+            Score[0][j] = Score[0][j-1] + metric.insert(Y.charAt(j-1));
+        }
+
+        for (int i = 1; i < X.length(); i++) {
+            Score[1][0] = Score[0][0] + metric.delete(X.charAt(i-1));
+            for (int j = 1; j < Y.length(); j++) {
+                scoreSub = Score[0][j-1] + metric.get(X.charAt(i-1),Y.charAt(j-1));
+                scoreDel = Score[0][j] + metric.delete(X.charAt(i-1));
+                scoreIns = Score[1][j-1] + metric.insert(Y.charAt(j-1));
+                Score[1][j] = Math.max(scoreSub, Math.max(scoreDel, scoreIns));
+                if (Score[1][j] == scoreSub){
+
+                }
+                if (Score[1][j] == scoreDel){
+                    X = X.substring(0,i-1) + "-" + X.substring(i);
+                }
+                if (Score[1][j] == scoreIns){
+                    Y = Y.substring(0,j-1) + "-" + Y.substring(j);
+                }
+            }
+            //copy Score[1] to Score[0]
+            Score[0] = Score[1];
+        }
+        int[] LastLine = new int[Y.length()];
+        for (int j = 0; j < Y.length(); j++) {
+            LastLine[j] = Score[1][j];
+        }
+        String[] ret = {X};
+        return ret;
+
     }
 
     static int[] NWScore(String X, String Y) {
@@ -170,8 +210,8 @@ public class Main {
         }
         else if (X.length() == 1 || Y.length() == 1) {
             String[] A;
-            //A = NeedlemanWunsch(X,Y);
-            A = Hirschberg(X,Y);
+            A = NeedlemanWunsch(X,Y);
+            //A = Hirschberg(X,Y);
             Z = Z + A[0];
             W = W + A[1];
         }
