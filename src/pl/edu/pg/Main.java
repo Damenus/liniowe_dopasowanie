@@ -59,7 +59,9 @@ public class Main {
         String sekwencjaB = readFile("sekwencjaB.txt");
         //saveFile(sekwencjaA);
         odlegloscEdycyjna(sekwencjaA,sekwencjaB);
-        funkcjaKaryWDopasowaniu("CAGCCCTACT","CCTGTACCC");
+        funkcjaKaryWDopasowaniu(sekwencjaA,sekwencjaB);
+        funkcjaKaryWDopasowaniu("AACCCAA","AAAA");
+        funkcjaKaryWDopasowaniu("CAGCCCTAC","CCTGTACCC");
 
     }
 
@@ -67,7 +69,6 @@ public class Main {
         int a = 1;
         int b = 1;
         int function = -a-b*x;
-        //function = x + 2;
         return function;
     }
 
@@ -99,39 +100,41 @@ public class Main {
         int liczbaLiterA = sekwencjaA.length();
         int liczbaLiterB = sekwencjaB.length();
 
-        int[][] A = new int[liczbaLiterA][liczbaLiterB];
-        int[][] B = new int[liczbaLiterA][liczbaLiterB];
-        int[][] C = new int[liczbaLiterA][liczbaLiterB];
-        int[][] S = new int[liczbaLiterA][liczbaLiterB];
-        int[][] SS = new int[liczbaLiterA][liczbaLiterB];
+        int[][] A = new int[liczbaLiterA+1][liczbaLiterB+1];
+        int[][] B = new int[liczbaLiterA+1][liczbaLiterB+1];
+        int[][] C = new int[liczbaLiterA+1][liczbaLiterB+1];
+        int[][] S = new int[liczbaLiterA+1][liczbaLiterB+1];
+        int[][] SS = new int[liczbaLiterA+1][liczbaLiterB+1];
 
         // 0. inicjalizacja
-        for (int i = 0; i < liczbaLiterA; i++) {
-            for (int j = 0; j < liczbaLiterB; j++) {
+        for (int i = 0; i < liczbaLiterA+1; i++) {
+            for (int j = 0; j < liczbaLiterB+1; j++) {
                 A[i][j] = Integer.MIN_VALUE;
                 B[i][j] = Integer.MIN_VALUE;
                 C[i][j] = Integer.MIN_VALUE;
                 S[i][j] = Integer.MIN_VALUE;
+                SS[i][j] = Integer.MIN_VALUE;
             }
         }
 
         // 1. Brzeg tabeli
         S[0][0] = 0;
+        SS[0][0] = 0;
 
-        for (int i = 0; i < liczbaLiterA; i++) {
+        for (int i = 1; i < liczbaLiterA+1; i++) {
             S[i][0] = p(i);
             B[i][0] = p(i);
 
         }
-        for (int j = 0; j < liczbaLiterB; j++) {
+        for (int j = 1; j < liczbaLiterB+1; j++) {
             S[0][j] = p(j);
             A[0][j] = p(j);
         }
 
 
         // 2. Środek tabeli
-        for (int i = 1; i < liczbaLiterA; i++) {
-            for (int j = 1; j < liczbaLiterB; j++) {
+        for (int i = 1; i < liczbaLiterA+1; i++) {
+            for (int j = 1; j < liczbaLiterB+1; j++) {
 
                 int[] AK = new int[j];
                 for (int k = 0; k < j; k++) {
@@ -145,17 +148,34 @@ public class Main {
                 }
                 B[i][j] = max(BK);
 
-                C[i][j] = S[i-1][j-1] + s(sekwencjaA.charAt(i),sekwencjaB.charAt(j));
+                C[i][j] = S[i-1][j-1] + s(sekwencjaA.charAt(i-1),sekwencjaB.charAt(j-1));
 
-                S[i][j] = Math.max(Math.max(A[i][j],B[i][j]),C[i][j]);
+                //S[i][j] = Math.max(Math.max(A[i][j],B[i][j]),C[i][j]);
+                if (A[i][j] > B[i][j]) {
+                    if (A[i][j] > C[i][j]) {
+                        S[i][j] = A[i][j];
+                        SS[i][j] = 2;
+                    } else {
+                        S[i][j] = C[i][j];
+                        SS[i][j] = 1;
+                    }
+                } else {
+                    if (B[i][j] > C[i][j]) {
+                        S[i][j] = B[i][j];
+                        SS[i][j] = 0;
+                    } else {
+                        S[i][j] = C[i][j];
+                        SS[i][j] = 1;
+                    }
+                }
 
             }
         }
 
 
         System.out.println();
-        for (int i = 0; i < liczbaLiterA; i++) {
-            for (int j = 0; j < liczbaLiterB; j++) {
+        for (int i = 0; i < liczbaLiterA+1; i++) {
+            for (int j = 0; j < liczbaLiterB+1; j++) {
                 System.out.print(S[i][j] + "   ");
             }
             System.out.println();
@@ -165,46 +185,29 @@ public class Main {
         String newA = "";
         String newB = "";
 
-        int i = liczbaLiterA-1;
-        int j = liczbaLiterB-1;
+        int i = liczbaLiterA;
+        int j = liczbaLiterB;
 
         int[] best = new int[3];
         int bestOne;
 
         while(i > 0 && j > 0) {
-            best[0] = S[i-1][j];
-            best[1] = S[i-1][j-1];
-            best[2] = S[i][j-1];
 
-            if (best[0] > best[1]) {
-                if (best[0] > best[2]) {
-                    bestOne = 0;
-                } else {
-                    bestOne = 2;
-                }
-            } else {
-                if (best[1] > best[2]) {
-                    bestOne = 1;
-                } else {
-                    bestOne = 2;
-                }
-            }
-
-            if (bestOne == 0) {
-                newA += sekwencjaA.charAt(i);
+            if (SS[i][j] == 0) {
+                newA += sekwencjaA.charAt(i-1);
                 newB += '-';
                 i--;
             }
-            else if (bestOne == 1) {
-                newA += sekwencjaA.charAt(i);
-                newB += sekwencjaB.charAt(j);
+            else if (SS[i][j] == 1) {
+                newA += sekwencjaA.charAt(i-1);
+                newB += sekwencjaB.charAt(j-1);
                 i--;
                 j--;
 
             }
-            else if (bestOne == 2) {
+            else if (SS[i][j] == 2) {
                 newA += '-';
-                newB += sekwencjaB.charAt(j);
+                newB += sekwencjaB.charAt(j-1);
                 j--;
             }
 
@@ -226,7 +229,7 @@ public class Main {
         System.out.println(rev(newA));
         System.out.println(rev(newB));
 
-        return S[liczbaLiterA-1][liczbaLiterB-1];
+        return S[liczbaLiterA][liczbaLiterB];
     }
 
     static int odlegloscEdycyjna(String sekwencjaA, String sekwencjaB) {
@@ -239,19 +242,19 @@ public class Main {
         int liczbaLiterA = sekwencjaA.length();
         int liczbaLiterB = sekwencjaB.length();
 
-        int[][] tablica = new int[liczbaLiterA+liczbaLiterB+1][liczbaLiterA+liczbaLiterB+1];
+        int[][] tablica = new int[liczbaLiterA+1][liczbaLiterB+1];
 
         // 1. Brzeg tabeli
         tablica[0][0] = 0;
 
-        for(int i = 1; i < liczbaLiterA+liczbaLiterB; i++) {
+        for(int i = 1; i < liczbaLiterA+1; i++) {
             for(int k = 0; k < i; k++) {
                 //tablica[i][0] += metric.get(sekwencjaA.charAt(k), '-');
                 tablica[i][0] = i * pgap;
             }
         }
 
-        for(int j = 1; j < liczbaLiterB+liczbaLiterB; j++) {
+        for(int j = 1; j < liczbaLiterB+1; j++) {
             for(int k = 0; k < j; k++) {
                 //tablica[0][j] += metric.get(sekwencjaB.charAt(k), '-');
                 tablica[0][j] = j * pgap;
@@ -270,16 +273,13 @@ public class Main {
                 );
             }
 
-        for (int i = 0; i < liczbaLiterA+liczbaLiterB+1; i++) {
-            for (int j = 0; j < liczbaLiterA+liczbaLiterB+1; j++) {
+        for (int i = 0; i < liczbaLiterA+1; i++) {
+            for (int j = 0; j < liczbaLiterB+1; j++) {
                 System.out.print(tablica[i][j] + "   ");
             }
             System.out.println();
         }
 
-//        for( int i = sekwencjaA.length(); i >= 0; i-- ) {
-//
-//        }
 
         int l = sekwencjaA.length() + sekwencjaB.length(); // maximum possible length
 
@@ -310,12 +310,12 @@ public class Main {
             else if (tablica[i - 1][j] + pgap == tablica[i][j])
             {
                 xans[xpos--] = (int)sekwencjaA.charAt(i - 1);
-                yans[ypos--] = (int)'_';
+                yans[ypos--] = (int)'-';
                 i--;
             }
             else if (tablica[i][j - 1] + pgap == tablica[i][j])
             {
-                xans[xpos--] = (int)'_';
+                xans[xpos--] = (int)'-';
                 yans[ypos--] = (int)sekwencjaB.charAt(j - 1);
                 j--;
             }
@@ -323,19 +323,19 @@ public class Main {
         while (xpos > 0)
         {
             if (i > 0) xans[xpos--] = (int)sekwencjaA.charAt(--i);
-            else xans[xpos--] = (int)'_';
+            else xans[xpos--] = (int)'-';
         }
         while (ypos > 0)
         {
             if (j > 0) yans[ypos--] = (int)sekwencjaB.charAt(--j);
-            else yans[ypos--] = (int)'_';
+            else yans[ypos--] = (int)'-';
         }
 
         int id = 1;
         for (i = l; i >= 1; i--)
         {
-            if ((char)yans[i] == '_' &&
-                    (char)xans[i] == '_')
+            if ((char)yans[i] == '-' &&
+                    (char)xans[i] == '-')
             {
                 id = i + 1;
                 break;
