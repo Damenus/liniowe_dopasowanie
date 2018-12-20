@@ -138,8 +138,8 @@ public class Main {
         yOut[0][0] = "";
         for (int j = 0; j < Y.length(); j++) {
             Score[0][j + 1] = Score[0][j] + metric.insert(Y.charAt(j));
-            xOut[0][j + 1] = "";
-            yOut[0][j + 1] = yOut[0][j] + "-";
+            xOut[0][j + 1] = xOut[0][j] + "-";
+            yOut[0][j + 1] = yOut[0][j] + Y.charAt(j);
 
             System.out.print(" >" + Score[0][j + 1] + "-/" + yOut[0][j + 1]);
         }
@@ -147,9 +147,9 @@ public class Main {
 
         for (int i = 0; i < X.length(); i++) {
             Score[1][0] = Score[0][0] + metric.delete(X.charAt(i));
-            xOut[1][0] = xOut[0][0] + "-";
-            yOut[1][0] = yOut[0][0];
-            System.out.print(" v" + Score[1][0] + xOut[1][0] + "/-");
+            xOut[1][0] = xOut[0][0] + X.charAt(i);
+            yOut[1][0] = yOut[0][0] + "-";
+            System.out.print(" v" + Score[1][0] + xOut[1][0] + "/" + yOut[1][0]);
             for (int j = 0; j < Y.length(); j++) {
                 scoreSub = Score[0][j] + metric.get(X.charAt(i),Y.charAt(j));
                 //scoreSub = Score[0][j] + (X.charAt(i) == Y.charAt(j) ? 1 : -1);
