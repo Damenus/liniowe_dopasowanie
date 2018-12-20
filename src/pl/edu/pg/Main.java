@@ -86,13 +86,13 @@ public class Main {
     static int s(char a, char b) {
 
         if (a == b) {
-            return 2;
+            return 6;
         }
         else if ( a == '-' || b == '-') {
-            return -1;
+            return 3;
         }
         else
-            return 0;
+            return -2;
     }
 
     static int funkcjaKaryWDopasowaniu(String sekwencjaA, String sekwencjaB) {
