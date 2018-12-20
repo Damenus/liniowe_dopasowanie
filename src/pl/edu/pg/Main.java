@@ -62,7 +62,6 @@ public class Main {
 
 
         NeedlemanWunsch(sekwencjaA,sekwencjaB);
-        /*
         String A,B;
         String[] result;
         result = Hirschberg(sekwencjaA, sekwencjaB);
@@ -70,7 +69,7 @@ public class Main {
         B = result[1];
         System.out.println(A);
         System.out.println(B);
-        saveFile(A + ":" + B);*/
+        saveFile(A + ":" + B);
 
     }
 
@@ -248,12 +247,12 @@ public class Main {
         if (X.length() == 0) {
             for (int i = 1; i < Y.length(); i++) {
                 Z = Z + '-';
-                W = W + Y.charAt(i);
+                W = W + Y.charAt(i-1);
             }
         }
         else if (Y.length() == 0) {
             for (int i = 1; i < X.length(); i++) {
-                Z = Z + X.charAt(i);
+                Z = Z + X.charAt(i-1);
                 W = W + '-';
             }
         }
@@ -270,13 +269,13 @@ public class Main {
             ylen = Y.length();
 
             ScoreL = NWScore(X.substring(0,xmid), Y);
-            ScoreR = NWScore(rev(X.substring(xmid+1,xlen)), rev(Y));
+            ScoreR = NWScore(rev(X.substring(xmid,xlen)), rev(Y));
             //ymid = max(concatenate(ScoreL, rev(ScoreR)));
             ymid = partition(ScoreL, rev(ScoreR));
 
             String[] A, B;
             A = Hirschberg(X.substring(0,xmid), Y.substring(0,ymid));
-            B = Hirschberg(X.substring(xmid+1,xlen), Y.substring(ymid+1,ylen));
+            B = Hirschberg(X.substring(xmid,xlen), Y.substring(ymid,ylen));
             Z = A[0] + B[0];
             W = A[1] + B[1];
         }
