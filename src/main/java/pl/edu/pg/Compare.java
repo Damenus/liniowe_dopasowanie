@@ -9,9 +9,23 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashMap;
 
-import static java.lang.Class.forName;
+import org.biojava.nbio.alignment.NeedlemanWunsch;
 
-public class Main {
+import static java.lang.Class.forName;
+import java.util.Random;
+import org.biojava.nbio.alignment.SimpleGapPenalty;
+import org.biojava.nbio.alignment.template.GapPenalty;
+import org.biojava.nbio.core.alignment.matrices.SimpleSubstitutionMatrix;
+import org.biojava.nbio.core.alignment.template.SubstitutionMatrix;
+import org.biojava.nbio.core.exceptions.CompoundNotFoundException;
+import org.biojava.nbio.core.sequence.BasicSequence;
+import org.biojava.nbio.core.sequence.compound.DNACompoundSet;
+import org.biojava.nbio.core.sequence.template.CompoundSet;
+import org.biojava.nbio.core.sequence.template.Sequence;
+
+public class Compare {
+    static Random random = new Random();
+    static String[] set = new String[]{"A", "T", "C", "G"};
 
     static Metric metric;
 
@@ -51,17 +65,31 @@ public class Main {
         }
     }
 
-    public static void main(String[] args) {
-
+    public static void main(String[] args) throws Exception{
         Metric metric = readMetrics();
+        
+        System.out.println();
+        System.out.println();
+        
         System.out.println(metric.get("A", "T"));
         String sekwencjaA = readFile("sekwencjaA.txt");
         String sekwencjaB = readFile("sekwencjaB.txt");
-        saveFile(sekwencjaA);
+        //saveFile(sekwencjaA);
         odlegloscEdycyjna(metric);
 
-
-        NeedlemanWunsch(sekwencjaA,sekwencjaB);
+        test(sekwencjaA, sekwencjaB); 
+        
+        
+        int cnt = 100;
+        int ok = 0;
+        for(int i = 0; i < cnt; i++){
+            boolean success = test(generate(), generate());
+            if (success){
+                ok++;
+            }
+        }
+        System.out.println("Ok: " + ok + " out of " + cnt);
+        
         /*
         String A,B;
         String[] result;
@@ -71,7 +99,42 @@ public class Main {
         System.out.println(A);
         System.out.println(B);
         saveFile(A + ":" + B);*/
-
+    }
+    
+    public static String generate(){
+        String res = "";
+        for(int i = 0; i < 10; i++){
+            res += set[random.nextInt(4)];
+        }
+        return res;
+    }
+    
+    public static boolean test(String a, String b) throws CompoundNotFoundException{
+        CompoundSet compoundSet = new DNACompoundSet();
+        
+        Sequence seq1 = new BasicSequence(a, compoundSet);
+        Sequence seq2 = new BasicSequence(b, compoundSet);
+        GapPenalty gapPenalty = new SimpleGapPenalty(0, 1); // gap open, gap extend
+        SubstitutionMatrix subMatrix = new SimpleSubstitutionMatrix(compoundSet, (short)2, (short)-1); // match, replace
+        
+        NeedlemanWunsch nw = new NeedlemanWunsch(seq1, seq2, gapPenalty, subMatrix);
+        
+        
+        //System.out.println(nw.getProfile().toString());
+        //System.out.println(nw.getQuery().toString());
+        //System.out.println(nw.getTarget().toString());
+        //System.out.println(nw.getScore());
+        
+        //System.out.println(nw.getScoreMatrixAsString());
+        
+        Result res = myNeedlemanWunsch(a,b);
+     
+        if(res.score == nw.getScore()){
+            System.out.println("[OK]  " + a + "/" + b + ": " + nw.getScore());
+            return true;
+        }
+        System.out.println("[ERR] " + a + "/" + b + ": " + res.score + " / " + nw.getScore());
+        return false;
     }
 
     static int odlegloscEdycyjna(Metric metric) {
@@ -110,17 +173,17 @@ public class Main {
                         )
                 );
 
-        for (int i = 0; i < liczbaLiterA; i++) {
+        /*for (int i = 0; i < liczbaLiterA; i++) {
             for (int j = 0; j < liczbaLiterB; j++) {
                 System.out.print(tablica[i][j] + "   ");
             }
             System.out.println();
-        }
+        }*/
 
         return tablica[liczbaLiterA-1][liczbaLiterB-1];
     }
 
-    static String[] NeedlemanWunsch(String X, String Y) {
+    static Result myNeedlemanWunsch(String X, String Y) {
         int scoreSub, scoreDel, scoreIns;
 
         //Metric metric = readMetrics();
@@ -130,9 +193,9 @@ public class Main {
         String[][] yOut = new String[2][Y.length() + 1];
 
 
-        System.out.println(X + ", " + Y);
+        //System.out.println(X + ", " + Y);
 
-        System.out.print(" ." + "0" + "./.");
+        //System.out.print(" ." + "0" + "./.");
 
         xOut[0][0] = "";
         yOut[0][0] = "";
@@ -141,15 +204,15 @@ public class Main {
             xOut[0][j + 1] = xOut[0][j] + "-";
             yOut[0][j + 1] = yOut[0][j] + Y.charAt(j);
 
-            System.out.print(" >" + Score[0][j + 1] + "-/" + yOut[0][j + 1]);
+            //System.out.print(" >" + Score[0][j + 1] + "-/" + yOut[0][j + 1]);
         }
-        System.out.println();
+        //System.out.println();
 
         for (int i = 0; i < X.length(); i++) {
             Score[1][0] = Score[0][0] + metric.delete(X.charAt(i));
             xOut[1][0] = xOut[0][0] + X.charAt(i);
             yOut[1][0] = yOut[0][0] + "-";
-            System.out.print(" v" + Score[1][0] + xOut[1][0] + "/" + yOut[1][0]);
+            //System.out.print(" v" + Score[1][0] + xOut[1][0] + "/" + yOut[1][0]);
             for (int j = 0; j < Y.length(); j++) {
                 scoreSub = Score[0][j] + metric.get(X.charAt(i),Y.charAt(j));
                 //scoreSub = Score[0][j] + (X.charAt(i) == Y.charAt(j) ? 1 : -1);
@@ -161,21 +224,21 @@ public class Main {
                     xOut[1][j + 1] = xOut[0][j] + X.charAt(i);
                     yOut[1][j + 1] = yOut[0][j] + Y.charAt(j);
 
-                    System.out.print(" \\" + Score[1][j + 1]);
-                    System.out.print(" " + xOut[1][j + 1] + "/" + yOut[1][j + 1] + "|");
+                    //System.out.print(" \\" + Score[1][j + 1]);
+                    //System.out.print(" " + xOut[1][j + 1] + "/" + yOut[1][j + 1] + "|");
                 }
                 else {
                     if (Score[1][j + 1] == scoreDel){
                         xOut[1][j + 1] = xOut[0][j + 1] + X.charAt(i);
                         yOut[1][j + 1] = yOut[0][j + 1] + "-";
-                        System.out.print(" v" + Score[1][j + 1]);
-                        System.out.print(" " + xOut[1][j + 1] + "/" + yOut[1][j + 1] + "|");
+                        //System.out.print(" v" + Score[1][j + 1]);
+                        //System.out.print(" " + xOut[1][j + 1] + "/" + yOut[1][j + 1] + "|");
                     }
                     else {
                         xOut[1][j + 1] = xOut[1][j] + "-";
                         yOut[1][j + 1] = yOut[1][j] + Y.charAt(j);
-                        System.out.print(" >" + Score[1][j + 1]);
-                        System.out.print(" " + xOut[1][j + 1] + "/" + yOut[1][j + 1] + "|");
+                        //System.out.print(" >" + Score[1][j + 1]);
+                        //System.out.print(" " + xOut[1][j + 1] + "/" + yOut[1][j + 1] + "|");
                     }
                 }
             }
@@ -185,15 +248,18 @@ public class Main {
                 xOut[0][j] = xOut[1][j];
                 yOut[0][j] = yOut[1][j];
             }
-            System.out.println();
+            //System.out.println();
         }
 
-        System.out.println();
-        System.out.println(xOut[0][Y.length()]);
-        System.out.println(yOut[0][Y.length()]);
-        System.out.println(Score[0][Y.length()]);
+        //System.out.println();
+        //System.out.println(xOut[0][Y.length()]);
+        //System.out.println(yOut[0][Y.length()]);
+        //System.out.println(Score[0][Y.length()]);
 
-        String[] ret = {xOut[0][Y.length()], yOut[0][Y.length()]};
+        Result ret = new Result();
+        ret.a = xOut[0][Y.length()];
+        ret.b = yOut[0][Y.length()];
+        ret.score = Score[0][Y.length()];
         return ret;
     }
 
@@ -258,8 +324,8 @@ public class Main {
             }
         }
         else if (X.length() == 1 || Y.length() == 1) {
-            String[] A;
-            A = NeedlemanWunsch(X,Y);
+            Result res = myNeedlemanWunsch(X,Y);
+            String[] A = new String[]{res.a, res.b};
             //A = Hirschberg(X,Y);
             Z = Z + A[0];
             W = W + A[1];
@@ -334,5 +400,9 @@ public class Main {
         return index;
     }
 
-
+    static class Result {
+        public String a;
+        public String b;
+        double score;
+    }
 }
