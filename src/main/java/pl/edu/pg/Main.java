@@ -60,16 +60,18 @@ public class Main {
 
         DNASequence dnaSequence1 = new DNASequence(sekwencjaA);
         DNASequence dnaSequence2 = new DNASequence(sekwencjaB);
+        SimpleGapPenalty simpleGapPenalty = new SimpleGapPenalty();
 
         // najlepsze globalne
         SubstitutionMatrix<NucleotideCompound> matrix = SubstitutionMatrixHelper.getNuc4_4();
-        SequencePair<DNASequence, NucleotideCompound> pair = Alignments.getPairwiseAlignment(dnaSequence1, dnaSequence2, Alignments.PairwiseSequenceAlignerType.GLOBAL, new SimpleGapPenalty(), matrix);
-        System.out.printf("Best global alignments \n%s", pair);
+        SequencePair<DNASequence, NucleotideCompound> pair = Alignments.getPairwiseAlignment(dnaSequence1, dnaSequence2, Alignments.PairwiseSequenceAlignerType.GLOBAL, simpleGapPenalty, matrix);
+        System.out.printf("Best global alignments \n%s%f\n%d\n", pair, pair.getPercentageOfIdentity(true), pair.getNumSimilars());
 
         // najlepsze lokalne
         SubstitutionMatrix<NucleotideCompound> matrix2 = SubstitutionMatrixHelper.getNuc4_4();
         SequencePair<DNASequence, NucleotideCompound> pair2 = Alignments.getPairwiseAlignment(dnaSequence1, dnaSequence2, Alignments.PairwiseSequenceAlignerType.LOCAL, new SimpleGapPenalty(), matrix2);
-        System.out.printf("Best local alignments \n%s", pair2);
+        System.out.printf("Best local alignments \n%s%f\n%d\n", pair2, pair2.getPercentageOfIdentity(true), pair2.getNumSimilars());
+
         
     }
 }
