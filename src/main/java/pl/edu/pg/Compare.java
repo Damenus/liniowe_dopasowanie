@@ -91,9 +91,6 @@ public class Compare {
         System.out.println("Ok: " + ok + " out of " + cnt);
         
         /*
-
-        NeedlemanWunsch(sekwencjaA,sekwencjaB);
-        
         String A,B;
         String[] result;
         result = Hirschberg(sekwencjaA, sekwencjaB);
@@ -101,7 +98,6 @@ public class Compare {
         B = result[1];
         System.out.println(A);
         System.out.println(B);
-<<<<<<< HEAD:src/main/java/pl/edu/pg/Compare.java
         saveFile(A + ":" + B);*/
     }
     
@@ -134,15 +130,11 @@ public class Compare {
         Result res = myNeedlemanWunsch(a,b);
      
         if(res.score == nw.getScore()){
-            System.out.println("[OK]  " + a + "/" + b + ": " + nw.getScore());
+            System.out.println("[OK]  " + a + "/" + b + ": " + nw.getScore() + " " + nw.getScoreMatrixAsString() + " " + nw.getDistance() + " " + nw.getSimilarity() + " " );
             return true;
         }
         System.out.println("[ERR] " + a + "/" + b + ": " + res.score + " / " + nw.getScore());
         return false;
-=======
-        saveFile(A + ":" + B);
-
->>>>>>> b5670b225988487c3a9b93d6994efa4a27b1554e:src/pl/edu/pg/Main.java
     }
 
     static int odlegloscEdycyjna(Metric metric) {
