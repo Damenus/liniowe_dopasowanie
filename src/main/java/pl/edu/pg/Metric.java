@@ -74,9 +74,9 @@ public class Metric {
         return metrics.get(a.codePointAt(0) + b.codePointAt(0)).intValue();
     }
 
-    public int get(String a) {
+    /*public int get(String a) {
         return metrics.get(a.codePointAt(0) + a.codePointAt(1)).intValue();
-    }
+    }*/
 
     public int insert(char a) {
         if (insertCost.get(a) == null){
